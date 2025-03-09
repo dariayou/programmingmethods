@@ -1,3 +1,4 @@
+//Haskell//
 bus :: Int -> String
 bus n
   | n `mod` 15 == 0 = "FizzBuzz! "
