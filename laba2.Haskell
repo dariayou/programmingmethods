@@ -1,0 +1,48 @@
+import Control.Monad (replicateM)
+import System.Random (randomRIO)
+
+-- Генерация списка случайных чисел
+generateRandomList :: Int -> IO [Int]
+generateRandomList n = replicateM n (randomRIO (1, 100))
+
+-- Функция замены элемента в списке
+replace :: Int -> a -> [a] -> [a]
+replace i x xs = take i xs ++ [x] ++ drop (i + 1) xs
+
+-- Функция Shell Sort
+shellSort :: [Int] -> ([Int], Int, [Int])
+shellSort list = (finalList, totalComparisons, gaps)
+  where
+    gaps = takeWhile (> 0) $ iterate (`div` 2) (length list `div` 2)
+    (finalList, totalComparisons) = foldl sortStep (list, 0) gaps
+
+    sortStep (lst, count) gap = (shellInsert lst gap, count + length [gap .. length lst - 1])
+
+    shellInsert lst gap = foldl insert lst [gap .. length lst - 1]
+      where
+        insert acc i = go i acc (acc !! i)
+        go j acc temp
+          | j >= gap && acc !! (j - gap) > temp = 
+              let acc' = replace j (acc !! (j - gap)) acc
+              in go (j - gap) acc' temp
+          | otherwise = replace j temp acc
+
+main :: IO ()
+main = do
+    putStrLn "Введите количество элементов:"
+    size <- readLn
+
+    numbers <- generateRandomList size
+
+    putStrLn "Исходный массив:"
+    print numbers
+
+    let (sortedNumbers, comparisons, steps) = shellSort numbers
+
+    putStrLn "Отсортированный массив:"
+    print sortedNumbers
+
+    putStrLn $ "Количество сравнений: " ++ show comparisons
+
+    putStrLn "Шаги сортировки:"
+    print steps
