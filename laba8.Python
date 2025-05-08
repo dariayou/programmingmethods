@@ -1,0 +1,35 @@
+import datetime
+
+call_log = []
+
+def safe_division(func):
+    def wrapper(a, b):
+        if b == 0:
+            return "Ошибка: деление на ноль!"
+        return func(a, b)
+    return wrapper
+
+def log_calls(func):
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        log_entry = {
+            "params": [*args],
+            "result": result,
+            "date": datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        call_log.append(log_entry)
+        return result
+    return wrapper
+
+@log_calls
+@safe_division
+def div(a, b):
+    return f"{a} поделить на {b} равно {a / b}"
+
+print(div(8, 2))
+print(div(5, 0))
+print(div(12, 3))
+
+print("\nЛог вызовов:")
+for entry in call_log:
+    print(entry)
